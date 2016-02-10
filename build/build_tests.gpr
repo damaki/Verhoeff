@@ -1,0 +1,22 @@
+with "aunit";
+
+project Build_Tests is
+
+   for Object_Dir use "../out/tests";
+   for Source_Dirs use ("../test", "../src");
+   for Main use ("tests_main.adb");
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-ftest-coverage", "-fprofile-arcs", "-gnat12", "-gnata", "-g", "-fcallgraph-info=su,da", "-fstack-check", "-gnato");
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("ada") use ("-E");
+   end Binder;
+
+   package Linker is
+      for Default_Switches ("ada") use ("-g", "-fprofile-generate");
+   end Linker;
+
+end Build_Tests;
+

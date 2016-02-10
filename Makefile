@@ -10,8 +10,14 @@ build: $(BUILD_DIR)/libverhoeff.a
 proof:
 	gnatprove -P build/build_libverhoeff.gpr
 
+test: $(OUTPUT_DIR)/tests/tests_main
+	$(OUTPUT_DIR)/tests/tests_main
+
 $(BUILD_DIR)/libverhoeff.a:
-	gnatmake $(GNATMAKE_OPTS) -p -P build/build_libverhoeff
+	gprbuild -p -P build/build_libverhoeff
+	
+$(OUTPUT_DIR)/tests/tests_main:
+	gprbuild -p -P build/build_tests
 
 install: build
 	install -d -m 755 $(DESTDIR)/adalib $(DESTDIR)/adainclude
