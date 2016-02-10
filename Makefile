@@ -3,7 +3,7 @@ BUILD_DIR  = $(OUTPUT_DIR)/build
 
 ################################################################################
 
-all: build proof
+all: build proof test
 
 build: $(BUILD_DIR)/libverhoeff.a
 
