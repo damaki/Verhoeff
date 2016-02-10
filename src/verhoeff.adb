@@ -1,8 +1,9 @@
 package body Verhoeff
    with SPARK_Mode => On
 is
+   type Digit_Number is new Natural range 0 .. 9;
 
-   D : constant array(Digit, Digit) of Digit :=
+   D : constant array(Digit_Number, Digit_Number) of Digit_Number :=
     ((0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
      (1, 2, 3, 4, 0, 6, 7, 8, 9, 5),
      (2, 3, 4, 0, 1, 7, 8, 9, 5, 6),
@@ -14,10 +15,10 @@ is
      (8, 7, 6, 5, 9, 3, 2, 1, 0, 4),
      (9, 8, 7, 6, 5, 4, 3, 2, 1, 0));
    
-   Inv : constant array(Digit) of Digit :=
+   Inv : constant array(Digit_Number) of Digit_Number :=
     (0, 4, 3, 2, 1, 5, 6, 7, 8, 9);
     
-   P : constant array(Digit range 0 .. 7, Digit) of Digit :=
+   P : constant array(Digit_Number range 0 .. 7, Digit_Number) of Digit_Number :=
     ((0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
      (1, 5, 7, 6, 2, 8, 3, 0, 9, 4),
      (5, 8, 0, 3, 7, 9, 6, 1, 4, 2),
@@ -28,27 +29,35 @@ is
      (7, 0, 4, 6, 9, 1, 3, 2, 5, 8));
 
    -- Check that Inv(Inv(j)) == j
-   pragma Assert(for all J in Digit => Inv(Inv(J)) = J);
+   pragma Assert(for all J in Digit_Number => Inv(Inv(J)) = J);
    
    -- Check that D(j, Inv(j)) = 0
-   pragma Assert(for all J in Digit => D(J, Inv(J)) = 0);
+   pragma Assert(for all J in Digit_Number => D(J, Inv(J)) = 0);
    
    -- Check that P(i+j, n) = P(i, P(j, n))
-   pragma Assert(for all I in Digit =>
-                    (for all J in Digit =>
-                        (for all N in Digit =>
+   pragma Assert(for all I in Digit_Number =>
+                    (for all J in Digit_Number =>
+                        (for all N in Digit_Number =>
                             P((I+J) mod 8, N) = P(I mod 8, P(J mod 8, N))
                         )
                     )
                     
                 );
    
-   function Compute_Verhoeff(Seq     : in Digit_Array;
-                             Initial : in Digit) return Digit
+   function To_Digit_Number(Value : in Digit_Character) return Digit_Number
+   is (Digit_Number(Digit_Character'Pos(Value) - Digit_Character'Pos('0')))
+   with Inline;
+   
+   function To_Digit_Character(Value : in Digit_Number) return Digit_Character
+   is (Digit_Character'Val(Digit_Character'Pos('0') + Integer(Value)))
+   with Inline;
+   
+   function Compute_Verhoeff(Seq     : in Digit_String;
+                             Initial : in Digit_Character) return Digit_Number
    is
-      C : Digit   := Initial;
-      I : Natural := 0;
-      X : Natural := Seq'Length;
+      C : Digit_Number := To_Digit_Number(Initial);
+      I : Natural      := 0;
+      X : Natural      := Seq'Length;
    begin
       while X > 0 loop
          pragma Loop_Variant(Decreases => X);
@@ -56,7 +65,7 @@ is
          
          I := I + 1;
          X := X - 1;
-         C := D(C, P(Digit(I mod 8), Seq(Seq'First + X)));
+         C := D(C, P(Digit_Number(I mod 8), To_Digit_Number(Seq(Seq'First + X))));
       end loop;
       
       return C;
@@ -64,15 +73,15 @@ is
    
    
    
-   function Check_Digit(Seq : in Digit_Array) return Digit
+   function Check_Digit(Seq : in Digit_String) return Digit_Character
    is
    begin
-      return Inv(Compute_Verhoeff(Seq, 0));
+      return To_Digit_Character(Inv(Compute_Verhoeff(Seq, '0')));
    end Check_Digit;
    
    
    
-   function Is_Valid(Seq : in Digit_Array) return Boolean
+   function Is_Valid(Seq : in Digit_String) return Boolean
    is
    begin
       return 0 = Compute_Verhoeff(Seq(Seq'First .. Seq'Last - 1), Seq(Seq'Last));
