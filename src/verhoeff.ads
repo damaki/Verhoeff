@@ -24,15 +24,21 @@ package Verhoeff
 is
    subtype Digit_Character is Character range '0' .. '9';
    
-   type Digit_String is array(Natural range <>) of Digit_Character;
-   
-   function Check_Digit(Seq : in Digit_String) return Digit_Character;
+   function Check_Digit(Seq : in String) return Digit_Character
+     with Pre => (for all I in Seq'Range => (Seq(I) in Digit_Character));
    -- Compute the verhoeff check digit on a sequence.
+   --
+   -- The Seq string must contain only digits ('0' .. '9').
+   -- The string cannot contain any non-digit characters.
    
-   function Is_Valid(Seq : in Digit_String) return Boolean
-      with Pre => Seq'Length > 0;
-   -- Validate the check digit on a sequence.
+   function Is_Valid(Seq : in String) return Boolean
+     with Pre => (Seq'Length > 0
+                  and (for all I in Seq'Range => (Seq(I) in Digit_Character)));
+   -- Validate the check digit on a sequence
    --
    -- The check digit must be the last digit in the sequence.
+   --
+   -- The Seq string must contain only digits ('0' .. '9').
+   -- The string cannot contain any non-digit characters.
 
 end Verhoeff;

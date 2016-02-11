@@ -19,7 +19,6 @@
 -- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 -- IN THE SOFTWARE.
 -------------------------------------------------------------------------------
-with Ada.Unchecked_Conversion;
 with AUnit.Assertions; use AUnit.Assertions;
 with Verhoeff;         use Verhoeff;
 
@@ -34,12 +33,12 @@ is
    -- accepts the check digit.
    procedure Test_Case_1(T : in out Test)
    is
-      Test_String : constant Digit_String := "236";
+      Test_String : constant String := "236";
       
       Computed_Check_Digit : Digit_Character;
 
    begin
-   	  Computed_Check_Digit := Check_Digit(Test_String);
+      Computed_Check_Digit := Check_Digit(Test_String);
       
       Assert(Computed_Check_Digit = '3',
              "wrong check digit returned: " & Computed_Check_Digit);
@@ -57,12 +56,12 @@ is
    -- accepts the check digit.
    procedure Test_Case_2(T : in out Test)
    is
-      Test_String : constant Digit_String := "12345";
+      Test_String : constant String := "12345";
       
       Computed_Check_Digit : Digit_Character;
 
    begin
-   	  Computed_Check_Digit := Check_Digit(Test_String);
+      Computed_Check_Digit := Check_Digit(Test_String);
       
       Assert(Computed_Check_Digit = '1',
              "wrong check digit returned: " & Computed_Check_Digit);
@@ -81,15 +80,8 @@ is
    -- the check digits it computes and rejects any others.
    procedure Test_Symmetry(T : in out Test)
    is
-      Test_String          : Digit_String(1 .. 6);
+      Test_String          : String(1 .. 6);
       Computed_Check_Digit : Digit_Character;
-      
-      subtype To_String_Source is Digit_String(1 .. 6);
-      subtype To_String_Target is String(1 .. 6);
-      
-      function To_String is new Ada.Unchecked_Conversion
-         (Source => To_String_Source,
-          Target => To_String_Target);
       
    begin
       for A in Digit_Character loop
@@ -98,28 +90,28 @@ is
                for D in Digit_Character loop
                   for E in Digit_Character loop
                      for F in Digit_Character loop
-                        Test_String := Digit_String'(A,B,C,D,E,F);
+                        Test_String := String'(A,B,C,D,E,F);
                      
                         Computed_Check_Digit := Check_Digit(Test_String);
                      
                         -- Check that the check digit is valid
                         Assert(Is_Valid(Test_String & Computed_Check_Digit),
                                "computed check digit is invalid:" & 
-                               To_String(Test_String) & ' ' & Character(Computed_Check_Digit));
+                                Test_String & ' ' & Character(Computed_Check_Digit));
                             
                         -- Check that all other check digits are invalid
                         Assert((for all Invalid_Check_Digit in Digit_Character'Range =>
-                                   (if Invalid_Check_Digit /= Computed_Check_Digit
-                                    then not Is_Valid(Test_String & Invalid_Check_Digit)
+                                  (if Invalid_Check_Digit /= Computed_Check_Digit
+                                   then not Is_Valid(Test_String & Invalid_Check_Digit)
                                   )
                                ),
-                               "Is_Valid does not reject invalid check digits for: " & To_String(Test_String));
+                               "Is_Valid does not reject invalid check digits for: " & Test_String);
                      end loop;
                   end loop;
                end loop;
             end loop;
          end loop;
-   	  end loop;
+      end loop;
    
    end Test_Symmetry;
    
@@ -129,12 +121,10 @@ is
    -- The check digit of an empty string should be 0.
    procedure Test_Empty(T : in out Test)
    is
-   	  Empty_String : Digit_String(1 .. 0) := (others => '9');
-   
    begin
-      Assert(Check_Digit(Empty_String) = '0',
+      Assert(Check_Digit("") = '0',
              "check digit of an empty string is not 0");
-      Assert(Is_Valid(Empty_String & "0"),
+      Assert(Is_Valid("0"),
              "Is_Valid failed");
    end Test_Empty;
 

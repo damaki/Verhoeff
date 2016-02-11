@@ -73,8 +73,9 @@ is
    is (Digit_Character'Val(Digit_Character'Pos('0') + Integer(Value)))
    with Inline;
    
-   function Compute_Verhoeff(Seq     : in Digit_String;
+   function Compute_Verhoeff(Seq     : in String;
                              Initial : in Digit_Character) return Digit_Number
+     with Pre => (for all I in Seq'Range => (Seq(I) in Digit_Character))
    is
       C : Digit_Number := To_Digit_Number(Initial);
       I : Natural      := 0;
@@ -94,7 +95,7 @@ is
    
    
    
-   function Check_Digit(Seq : in Digit_String) return Digit_Character
+   function Check_Digit(Seq : in String) return Digit_Character
    is
    begin
       return To_Digit_Character(Inv(Compute_Verhoeff(Seq, '0')));
@@ -102,7 +103,7 @@ is
    
    
    
-   function Is_Valid(Seq : in Digit_String) return Boolean
+   function Is_Valid(Seq : in String) return Boolean
    is
    begin
       return 0 = Compute_Verhoeff(Seq(Seq'First .. Seq'Last - 1), Seq(Seq'Last));
