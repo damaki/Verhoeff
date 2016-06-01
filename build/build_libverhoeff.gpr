@@ -10,7 +10,7 @@ is
    for Source_Dirs use ("../src");
 
    package Prove is
-      for Switches use ("-j4","--timeout=10");
+      for Switches use ("-j4","--timeout=10","--level=2");
    end Prove;
 
    package Compiler is
